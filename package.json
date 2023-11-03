@@ -1,0 +1,22 @@
+{
+  "name": "crud-api",
+  "version": "1.0.0",
+  "description": "crud-api",
+  "main": "app.js",
+  "scripts": {
+    "start": "cross-env PORT=3000 node app.js",
+    "watch": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Frenk",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.0.1"
+  }
+}
