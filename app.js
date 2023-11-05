@@ -20,6 +20,7 @@ app.use(
 
 app.use(express.json());
 
+// Tasklist
 app.get('/tasklists', (req, res) => {
 
     TaskList.find({})
@@ -63,8 +64,64 @@ app.patch('/tasklists/:taskListId', (req, res) => {
 
 app.delete('/tasklists/:taskListId', (req, res) => {
 
-    TaskList.findByIdAndDelete(req.params.taskListId)
-        .then((taskList) => res.status(201).send(taskList))
+    const deleteAllTasks = (taskList) => {
+        Task.deleteMany({ _taskListId: req.params.taskListId })
+            .then(() => {
+                return taskList;
+            })
+            .catch((err) => console.error('Error: ', err));
+    };
+
+    const responseTaskList = TaskList.findByIdAndDelete(req.params.taskListId)
+        .then((taskList) => {
+            deleteAllTasks(taskList);
+        })
+        .catch((err) => console.error('Error: ', err));
+
+    res.status(200).send(responseTaskList);
+});
+
+// Task
+app.get('/tasklists/:taskListId/tasks', (req, res) => {
+
+    Task.find({ _taskListId: req.params.taskListId })
+        .then((tasks) => res.status(200).send(tasks))
+        .catch((err) => console.error('Error: ', err));
+});
+
+app.get('/tasklists/:taskListId/tasks/:taskId', (req, res) => {
+
+    Task.findOne({ _taskListId: req.params.taskListId, _id: req.params.taskId })
+        .then((task) => {
+            res.status(200).send(task);
+        })
+        .catch((err) => console.error('Error: ', err));
+});
+
+app.post('/tasklists/:taskListId/tasks', (req, res) => {
+
+    let taskObj = {
+        'title': req.body.title,
+        '_taskListId': req.params.taskListId,
+    };
+    Task(taskObj).save()
+        .then((task) => {
+            res.status(201).send(task);
+        })
+        .catch((err) => console.error('Error: ', err));
+});
+
+app.patch('/tasklists/:taskListId/tasks/:taskId', (req, res) => {
+
+    Task.findOneAndUpdate({ _taskListId: req.params.taskListId, _id: req.params.taskId }, { $set: req.body })
+        .then((task) => res.status(200).send(task))
+        .catch((err) => console.error('Error: ', err));
+});
+
+app.delete('/tasklists/:taskListId/tasks/:taskId', (req, res) => {
+
+    Task.findOneAndDelete({ _taskListId: req.params.taskListId, _id: req.params.taskId })
+        .then((task) => res.status(200).send(task))
         .catch((err) => console.error('Error: ', err));
 });
 
